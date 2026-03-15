@@ -3,548 +3,907 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clube do Livro - Recomendações</title>
+    <title>Clube do Livro - Recomendações e Leitura</title>
+    
+    <!-- Tailwind CSS para Estilização Rápida e Responsiva -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Configuração de Cores Customizadas do Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            900: '#78350f',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-        }
-        .fade-in {
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        /* Loader */
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3b82f6;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        /* Estilos Customizados */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; }
+        .hide { display: none !important; }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .book-card { transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+        .book-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+        .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        /* Barra de rolagem customizada */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
     </style>
 </head>
-<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
-    <!-- Navbar -->
-    <nav class="bg-white shadow-md sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center cursor-pointer" id="logo-btn">
-                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                    <span class="ml-2 text-xl font-bold text-gray-900">LivrosWeb</span>
+    <!-- NAVBAR -->
+    <nav class="glass sticky top-0 z-50 border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo -->
+                <div class="flex items-center cursor-pointer" onclick="app.navigate('home')">
+                    <i class="fa-solid fa-book-open text-brand-600 text-2xl mr-2"></i>
+                    <span class="font-bold text-xl text-slate-900 tracking-tight">LivroWeb</span>
                 </div>
+                
+                <!-- Buscador -->
+                <div class="hidden md:flex flex-1 max-w-md mx-8">
+                    <div class="relative w-full">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-search text-slate-400"></i>
+                        </div>
+                        <input type="text" id="searchInput" class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-full leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 sm:text-sm transition-colors" placeholder="Buscar livros, autores ou categorias...">
+                    </div>
+                </div>
+
+                <!-- Ações do Usuário -->
                 <div class="flex items-center space-x-4">
-                    <a href="mailto:geilsonlabsprojects@gmail.com?subject=Pedido%20de%20Publicação%20de%20Livro&body=Olá,%20gostaria%20de%20solicitar%20a%20adição%20de%20um%20novo%20livro.%0A%0ATítulo:%0AAutor:%0ACategoria:" 
-                       class="hidden sm:flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                        Publicar Livro
-                    </a>
+                    <button onclick="document.getElementById('suggestModal').classList.remove('hide')" class="hidden sm:flex items-center text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">
+                        <i class="fa-solid fa-lightbulb mr-1.5"></i> Sugerir Livro
+                    </button>
                     
-                    <!-- Auth Container -->
-                    <div id="auth-container" class="flex items-center">
-                        <div class="loader w-6 h-6 border-2" id="auth-loader"></div>
+                    <!-- Botões de Login/Logout -->
+                    <div id="authContainer">
+                        <button id="btnLogin" onclick="app.login()" class="flex items-center bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-full text-sm font-semibold transition-colors shadow-sm">
+                            <i class="fa-brands fa-google mr-2"></i> Entrar
+                        </button>
+                        <div id="userProfile" class="hide flex items-center space-x-3">
+                            <div class="flex flex-col text-right hidden sm:block">
+                                <span id="userNameDisplay" class="text-sm font-bold text-slate-900 block leading-tight">Usuário</span>
+                                <span class="text-xs text-brand-600 font-medium">Logado</span>
+                            </div>
+                            <div class="h-8 w-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-600 border border-brand-200 cursor-pointer" onclick="app.logout()" title="Sair">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content Area -->
-    <main class="flex-grow max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="flex-grow">
         
-        <!-- View: Home (Lista de Livros) -->
-        <div id="view-home" class="fade-in">
-            <div class="text-center mb-10">
-                <h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">Descubra e Recomende Leituras</h1>
-                <p class="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-                    Explore nossa biblioteca. Leia opiniões da comunidade e compartilhe o que você achou dos seus livros favoritos.
-                </p>
-                <div class="mt-4">
-                    <a href="mailto:geilsonlabsprojects@gmail.com?subject=Pedido de Publicação" class="sm:hidden inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
-                        Pedir para Publicar Livro
-                    </a>
+        <!-- PÁGINA: HOME -->
+        <div id="view-home" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Hero Section -->
+            <div class="bg-slate-900 rounded-3xl p-8 sm:p-12 mb-10 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between shadow-xl relative overflow-hidden">
+                <div class="relative z-10 max-w-2xl">
+                    <h1 class="text-3xl sm:text-5xl font-extrabold text-white mb-4 leading-tight">Descubra sua próxima <span class="text-brand-500">grande leitura</span>.</h1>
+                    <p class="text-slate-300 text-lg mb-6">Explore recomendações, leia avaliações e mergulhe em livros incríveis diretamente do seu navegador ou baixe em PDF.</p>
+                </div>
+                <div class="hidden sm:block text-brand-500 opacity-20 absolute right-10 -bottom-10">
+                    <i class="fa-solid fa-book-journal-whills" style="font-size: 15rem;"></i>
                 </div>
             </div>
 
-            <div id="books-loading" class="flex justify-center py-12">
-                <div class="loader"></div>
+            <!-- Filtros / Categorias -->
+            <div class="flex items-center space-x-4 overflow-x-auto pb-4 mb-6" id="categoryFilters">
+                <button class="px-4 py-2 rounded-full bg-brand-600 text-white font-medium text-sm whitespace-nowrap" onclick="app.filterCategory('all')">Todos</button>
+                <button class="px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium text-sm whitespace-nowrap" onclick="app.filterCategory('Finanças')">Finanças</button>
+                <button class="px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium text-sm whitespace-nowrap" onclick="app.filterCategory('Ficção')">Ficção</button>
+                <button class="px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium text-sm whitespace-nowrap" onclick="app.filterCategory('Desenvolvimento')">Desenvolvimento</button>
             </div>
 
-            <div id="books-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 hidden">
+            <!-- Lista de Livros -->
+            <div class="flex justify-between items-end mb-6">
+                <h2 class="text-2xl font-bold text-slate-900">Livros Recomendados</h2>
+                <div id="loadingIndicator" class="text-brand-600 text-sm font-medium"><i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Carregando...</div>
+            </div>
+            
+            <div id="booksGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
                 <!-- Livros injetados via JS -->
+            </div>
+            
+            <div id="noBooksMessage" class="hide text-center py-12 text-slate-500">
+                <i class="fa-solid fa-book-open text-4xl mb-3 text-slate-300"></i>
+                <p>Nenhum livro encontrado para esta busca ou categoria.</p>
             </div>
         </div>
 
-        <!-- View: Book Detail -->
-        <div id="view-book-detail" class="fade-in hidden">
-            <button id="back-btn" class="flex items-center text-blue-600 hover:text-blue-800 mb-6 font-medium">
-                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                Voltar aos livros
+        <!-- PÁGINA: DETALHES DO LIVRO -->
+        <div id="view-book-details" class="hide max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <button onclick="app.navigate('home')" class="mb-6 flex items-center text-slate-500 hover:text-brand-600 font-medium transition-colors">
+                <i class="fa-solid fa-arrow-left mr-2"></i> Voltar para a lista
             </button>
 
-            <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100 mb-8">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="md:flex">
-                    <div class="md:flex-shrink-0 bg-gray-200">
-                        <img id="detail-cover" class="h-64 w-full object-cover md:h-full md:w-64" src="" alt="Capa do Livro">
+                    <!-- Capa -->
+                    <div class="md:w-1/3 p-8 flex justify-center bg-slate-50 border-r border-slate-100">
+                        <img id="detailCover" src="" alt="Capa" class="w-full max-w-[250px] rounded-xl shadow-lg object-cover aspect-[2/3]">
                     </div>
-                    <div class="p-8 w-full">
-                        <div id="detail-category" class="uppercase tracking-wide text-sm text-blue-600 font-semibold">Categoria</div>
-                        <h2 id="detail-title" class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900">Título</h2>
-                        <p id="detail-author" class="mt-1 max-w-2xl text-lg text-gray-500">Autor</p>
-                        <p id="detail-description" class="mt-4 text-gray-600 leading-relaxed">
-                            Descrição...
-                        </p>
+                    
+                    <!-- Info -->
+                    <div class="md:w-2/3 p-8 flex flex-col justify-between">
+                        <div>
+                            <span id="detailCategory" class="inline-block px-3 py-1 rounded-full bg-brand-100 text-brand-700 text-xs font-bold uppercase tracking-wide mb-3">Categoria</span>
+                            <h1 id="detailTitle" class="text-3xl font-bold text-slate-900 mb-2">Nome do Livro</h1>
+                            <p id="detailAuthor" class="text-lg text-slate-500 font-medium mb-6">Por Autor</p>
+                            
+                            <div class="prose text-slate-600 mb-8 max-w-none">
+                                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-2">Sobre este livro</h3>
+                                <p id="detailDescription" class="leading-relaxed">Descrição...</p>
+                            </div>
+                        </div>
+
+                        <!-- Botões de Ação de Leitura -->
+                        <div class="flex flex-col sm:flex-row gap-4 border-t border-slate-100 pt-6 mt-6">
+                            <button id="btnReadWeb" onclick="app.startReading('web')" class="flex-1 bg-brand-600 hover:bg-brand-700 text-white py-3 px-6 rounded-xl font-bold text-center transition-colors shadow-md flex justify-center items-center">
+                                <i class="fa-solid fa-book-open-reader mr-2"></i> Ler Agora (WebBook)
+                            </button>
+                            <button id="btnReadPDF" onclick="app.startReading('pdf')" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white py-3 px-6 rounded-xl font-bold text-center transition-colors shadow-md flex justify-center items-center">
+                                <i class="fa-solid fa-file-pdf mr-2"></i> Abrir PDF
+                            </button>
+                        </div>
+                        
+                        <!-- Progresso do Usuário Logado -->
+                        <div id="userProgressContainer" class="hide mt-4 bg-brand-50 p-4 rounded-xl border border-brand-100 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <i class="fa-solid fa-bookmark text-brand-600 mr-3 text-xl"></i>
+                                <div>
+                                    <p class="text-xs text-brand-800 font-bold uppercase">Seu Progresso</p>
+                                    <p class="text-sm text-slate-700"><span id="lblProgress">0</span>% lido</p>
+                                </div>
+                            </div>
+                            <div class="w-1/2 bg-white rounded-full h-2.5 border border-slate-200">
+                                <div id="barProgress" class="bg-brand-500 h-2.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Seção de Avaliações -->
-            <div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-6 border-b pb-2">Opiniões da Comunidade</h3>
-                
-                <!-- Formulário de Avaliação -->
-                <div id="review-form-container" class="bg-blue-50 rounded-xl p-6 mb-8 border border-blue-100 hidden">
-                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Deixe sua opinião</h4>
-                    <textarea id="review-input" rows="3" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md p-3" placeholder="O que você achou deste livro?"></textarea>
-                    <div class="mt-3 flex justify-end">
-                        <button id="submit-review-btn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            Postar Opinião
-                        </button>
-                    </div>
-                </div>
+            <!-- Seção de Opiniões -->
+            <div class="mt-12 bg-white rounded-3xl shadow-sm border border-slate-200 p-8">
+                <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center">
+                    <i class="fa-solid fa-comments text-brand-500 mr-3"></i> Opiniões dos Leitores
+                </h2>
 
-                <div id="login-prompt" class="bg-gray-50 rounded-xl p-6 mb-8 text-center border border-gray-200">
-                    <p class="text-gray-600 mb-3">Faça login com sua conta Google para deixar uma opinião.</p>
-                    <button id="prompt-login-btn" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                        <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                        Fazer Login com Google
+                <!-- Formulário (Só aparece se logado) -->
+                <div id="opinionFormContainer" class="hide mb-8 bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                    <h3 class="font-bold text-slate-800 mb-4">Deixe sua opinião</h3>
+                    <div class="flex items-center mb-3 text-brand-500 text-xl cursor-pointer" id="ratingStars">
+                        <i class="fa-solid fa-star" data-val="1"></i>
+                        <i class="fa-solid fa-star" data-val="2"></i>
+                        <i class="fa-solid fa-star" data-val="3"></i>
+                        <i class="fa-solid fa-star" data-val="4"></i>
+                        <i class="fa-solid fa-star" data-val="5"></i>
+                        <span class="ml-2 text-sm text-slate-500 font-medium" id="ratingText">5 estrelas</span>
+                    </div>
+                    <textarea id="opinionText" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none resize-none" rows="3" placeholder="O que você achou deste livro?"></textarea>
+                    <button onclick="app.submitOpinion()" class="mt-3 bg-slate-900 hover:bg-slate-800 text-white px-6 py-2 rounded-lg font-medium text-sm transition-colors">
+                        Enviar Opinião
                     </button>
                 </div>
+                
+                <div id="loginToCommentMsg" class="mb-8 p-4 bg-blue-50 text-blue-800 rounded-xl border border-blue-100 flex items-center justify-between">
+                    <span><i class="fa-solid fa-circle-info mr-2"></i> Faça login para deixar sua opinião e avaliar este livro.</span>
+                    <button onclick="app.login()" class="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold">Fazer Login</button>
+                </div>
 
-                <!-- Lista de Avaliações -->
-                <div id="reviews-list" class="space-y-4">
-                    <!-- Avaliações injetadas via JS -->
+                <!-- Lista de Opiniões -->
+                <div id="opinionsList" class="space-y-4">
+                    <!-- Opiniões injetadas via JS -->
+                    <div class="text-center text-slate-500 py-6"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Carregando opiniões...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PÁGINA: LEITOR WEB / PDF -->
+        <div id="view-reader" class="hide h-[calc(100vh-64px)] flex flex-col bg-slate-100">
+            <!-- Barra superior do leitor -->
+            <div class="bg-white px-4 py-3 border-b border-slate-200 flex justify-between items-center shadow-sm">
+                <div class="flex items-center">
+                    <button onclick="app.navigate('book-details')" class="mr-4 text-slate-500 hover:text-slate-900 h-10 w-10 rounded-full hover:bg-slate-100 flex justify-center items-center transition-colors">
+                        <i class="fa-solid fa-times text-xl"></i>
+                    </button>
+                    <div>
+                        <h2 id="readerTitle" class="font-bold text-slate-900 leading-tight">Lendo...</h2>
+                        <p class="text-xs text-brand-600 font-medium" id="readerModeIndicator">Modo WebBook</p>
+                    </div>
+                </div>
+                <!-- Progresso WebBook -->
+                <div id="webReaderProgress" class="hide flex items-center space-x-3 w-1/3 max-w-xs">
+                    <span class="text-xs font-bold text-slate-500 whitespace-nowrap"><span id="liveProgressTxt">0</span>%</span>
+                    <div class="w-full bg-slate-200 rounded-full h-1.5">
+                        <div id="liveProgressBar" class="bg-brand-500 h-1.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Container do Conteúdo -->
+            <div class="flex-grow overflow-hidden relative">
+                <!-- IFRAME para PDF -->
+                <iframe id="pdfFrame" class="hide w-full h-full border-0" src=""></iframe>
+                
+                <!-- CONTAINER TEXTO para WebBook -->
+                <div id="webBookContainer" class="hide w-full h-full overflow-y-auto bg-[#fdfaf6] p-4 sm:p-10">
+                    <div class="max-w-2xl mx-auto bg-white p-8 sm:p-12 shadow-sm border border-slate-100 rounded-lg text-lg text-slate-800 leading-relaxed font-serif" id="webBookContent">
+                        <!-- Conteúdo simulado do livro -->
+                    </div>
                 </div>
             </div>
         </div>
 
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 mt-auto">
-        <div class="max-w-6xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <p class="text-sm text-gray-500">© 2024 LivrosWeb. Todos os direitos reservados.</p>
-            <a href="mailto:geilsonlabsprojects@gmail.com" class="text-sm text-blue-600 hover:underline">Contato: geilsonlabsprojects@gmail.com</a>
-        </div>
-    </footer>
-
-    <!-- Modal de Mensagem -->
-    <div id="message-modal" class="fixed z-50 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeModal()"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
-                <div>
-                    <div class="mt-3 text-center sm:mt-5">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Aviso</h3>
-                        <div class="mt-2">
-                            <p class="text-sm text-gray-500" id="modal-message"></p>
-                        </div>
+    <!-- MODAL SUGERIR LIVRO -->
+    <div id="suggestModal" class="hide fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all">
+            <div class="bg-slate-900 p-6 text-white text-center">
+                <i class="fa-solid fa-paper-plane text-4xl text-brand-500 mb-3"></i>
+                <h3 class="text-xl font-bold">Publicar um Livro</h3>
+            </div>
+            <div class="p-6">
+                <p class="text-slate-600 mb-4 text-sm text-center">Quer ver seu livro favorito ou sua própria obra aqui no site? Siga os passos abaixo!</p>
+                
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-4 text-sm">
+                    <p class="font-bold text-slate-800 mb-2">Envie um e-mail para:</p>
+                    <div class="flex items-center justify-center p-2 bg-brand-100 text-brand-800 font-mono rounded font-bold cursor-copy select-all">
+                        geilsonlabsprojects@gmail.com
                     </div>
+                    <p class="font-bold text-slate-800 mt-4 mb-2">Com as seguintes informações:</p>
+                    <ul class="list-disc pl-5 text-slate-600 space-y-1">
+                        <li>Nome do livro</li>
+                        <li>Categoria</li>
+                        <li>Nome do Autor</li>
+                        <li>Link do Livro (PDF) ou texto para WebBook</li>
+                        <li>Imagem da Capa (Opcional)</li>
+                    </ul>
                 </div>
-                <div class="mt-5 sm:mt-6">
-                    <button type="button" onclick="closeModal()" class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:text-sm">
-                        OK
-                    </button>
-                </div>
+                
+                <p class="text-xs text-center text-slate-400 mb-6">Nossa equipe irá revisar e adicionar o livro ao Firebase.</p>
+                
+                <button onclick="document.getElementById('suggestModal').classList.add('hide')" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-3 rounded-xl transition-colors">
+                    Fechar
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Firebase e Lógica da Aplicação -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, 
-            GoogleAuthProvider, signInWithPopup, signOut 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, collection, onSnapshot, addDoc, doc, setDoc, serverTimestamp 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <!-- RODAPÉ -->
+    <footer class="bg-slate-900 text-slate-400 py-8 text-center" id="mainFooter">
+        <p class="mb-2"><i class="fa-solid fa-book-open text-brand-500 mr-2"></i> <strong>LivroWeb</strong> &copy; 2024. Todos os direitos reservados.</p>
+        <p class="text-xs">Sistema conectado com Firebase. Desenvolvido para leitores.</p>
+    </footer>
 
-        // ==========================================
-        // CONFIGURAÇÃO DO FIREBASE
-        // ==========================================
-        const isCanvas = typeof __firebase_config !== 'undefined';
-        
-        // Sua configuração do Firebase fornecida
-        const userFirebaseConfig = {
+    <!-- LÓGICA DO APLICATIVO (FIREBASE + JAVASCRIPT) -->
+    <script type="module">
+        // Importações do Firebase v11 SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, addDoc, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        /* * ==========================================
+         * CONFIGURAÇÃO FIREBASE
+         * ==========================================
+         * Para o ambiente de Preview funcionar sem erros de permissão,
+         * usamos variáveis globais e caminhos específicos do Firestore.
+         * * NO SEU PROJETO REAL COM REALTIME DATABASE:
+         * 1. Use a sua const firebaseConfig que você forneceu.
+         * 2. Importe 'getDatabase', 'ref', 'set', 'onValue' de 'firebase/database'.
+         * 3. Troque a lógica de collection/doc por ref(db, 'books/' + id).
+         * ==========================================
+         */
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            // Sua config entraria aqui como fallback, mas o preview injeta a dele.
             apiKey: "AIzaSyBTbdUYOhLLMFyo3aIx7sfxS12UHkNRaeY",
             authDomain: "livros-web.firebaseapp.com",
             projectId: "livros-web",
             storageBucket: "livros-web.firebasestorage.app",
             messagingSenderId: "1006236008054",
-            appId: "1:1006236008054:web:495b33ec29657e87372957",
-            measurementId: "G-B50V03QTXW"
+            appId: "1:1006236008054:web:495b33ec29657e87372957"
         };
-
-        const firebaseConfig = isCanvas ? JSON.parse(__firebase_config) : userFirebaseConfig;
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
         
-        // Gerenciamento de caminhos do Firestore dependendo do ambiente
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'livros-app';
-        const getCollectionPath = (colName) => {
-            if (isCanvas) {
-                return collection(db, 'artifacts', appId, 'public', 'data', colName);
-            }
-            return collection(db, colName);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-livros-app';
+
+        // Inicialização
+        const firebaseApp = initializeApp(firebaseConfig);
+        const auth = getAuth(firebaseApp);
+        const db = getFirestore(firebaseApp);
+
+        // Estado Global da Aplicação
+        window.appState = {
+            sysUser: null, // Usuário do sistema (obrigatório para DB)
+            isVisualUserLoggedIn: false, // Simulação visual de login Google para o preview
+            visualUserData: null,
+            books: [],
+            opinions: [],
+            currentBook: null,
+            currentCategory: 'all',
+            searchQuery: '',
+            currentRating: 5,
+            unsubscribeProgress: null // Para limpar listener de progresso
         };
 
         // ==========================================
-        // ESTADO GLOBAL
+        // 1. AUTENTICAÇÃO (REGRA 3: AUTH ANTES DE QUERIES)
         // ==========================================
-        let currentUser = null;
-        let allBooks = [];
-        let allReviews = [];
-        let currentView = 'home';
-        let currentBookId = null;
-
-        // Elementos da UI
-        const authContainer = document.getElementById('auth-container');
-        const viewHome = document.getElementById('view-home');
-        const viewBookDetail = document.getElementById('view-book-detail');
-        const booksGrid = document.getElementById('books-grid');
-        const booksLoading = document.getElementById('books-loading');
-        const reviewsList = document.getElementById('reviews-list');
-        const reviewFormContainer = document.getElementById('review-form-container');
-        const loginPrompt = document.getElementById('login-prompt');
-        const modal = document.getElementById('message-modal');
-
-        // ==========================================
-        // AUTENTICAÇÃO
-        // ==========================================
-        async function initAuth() {
+        const initAuth = async () => {
             try {
-                // Sempre tentar logar primeiramente de forma silenciosa
-                if (isCanvas && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
             } catch (error) {
-                console.error("Erro na inicialização da autenticação:", error);
+                console.error("Erro na autenticação inicial:", error);
             }
-        }
+        };
 
-        // Listener de estado de autenticação
+        // Observador de estado de autenticação
         onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            updateAuthUI();
-            
-            // Buscar dados apenas quando houver usuário autenticado
-            if (user && allBooks.length === 0) {
-                fetchData();
-            }
-
-            // Atualizar UI de detalhes do livro se estiver aberto
-            if (currentView === 'book' && currentBookId) {
-                updateReviewFormUI();
+            window.appState.sysUser = user;
+            if (user) {
+                console.log("Sistema autenticado. Carregando dados públicos...");
+                loadPublicData();
             }
         });
 
-        // Login com Google (Iniciado pelo Usuário)
-        window.handleGoogleLogin = async () => {
-            const provider = new GoogleAuthProvider();
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                console.error("Erro no login com Google:", error);
-                if (error.code === 'auth/popup-closed-by-user') {
-                    return; // Ignora se o usuário fechar a janela
+        // Executar Auth no início
+        initAuth();
+
+
+        // ==========================================
+        // 2. BUSCA DE DADOS (FIREBASE FIRESTORE)
+        // ==========================================
+        function loadPublicData() {
+            if (!window.appState.sysUser) return;
+
+            // --- A. Carregar Livros ---
+            // Caminho no seu Realtime DB: /books
+            // Caminho adaptado para o Preview (Firestore): /artifacts/{appId}/public/data/books
+            const booksRef = collection(db, 'artifacts', appId, 'public', 'data', 'books');
+            onSnapshot(booksRef, (snapshot) => {
+                const books = [];
+                snapshot.forEach(doc => {
+                    books.push({ id: doc.id, ...doc.data() });
+                });
+                
+                window.appState.books = books;
+                
+                // Se o banco estiver vazio (primeiro acesso), criar livros de exemplo
+                if (books.length === 0) seedMockBooks();
+                else renderBooks();
+                
+                document.getElementById('loadingIndicator').classList.add('hide');
+            }, (error) => console.error("Erro ao carregar livros:", error));
+
+            // --- B. Carregar Opiniões ---
+            // Caminho no seu Realtime DB: /opinions
+            const opinionsRef = collection(db, 'artifacts', appId, 'public', 'data', 'opinions');
+            onSnapshot(opinionsRef, (snapshot) => {
+                const ops = [];
+                snapshot.forEach(doc => {
+                    ops.push({ id: doc.id, ...doc.data() });
+                });
+                window.appState.opinions = ops;
+                
+                // Se estiver na página de detalhes, atualiza a lista de opiniões
+                if (window.appState.currentBook) {
+                    renderOpinions(window.appState.currentBook.id);
                 }
-                showModal("Não foi possível fazer o login com o Google neste ambiente. Tente abrir o site em uma nova guia ou janela externa.");
-            }
-        };
-
-        window.handleLogout = () => {
-            signOut(auth);
-            // Ao deslogar, o onAuthStateChanged fará login anônimo novamente via initAuth, 
-            // mas forçaremos um recarregamento para limpar o estado
-            window.location.reload();
-        };
-
-        function updateAuthUI() {
-            // Verifica se o usuário é anônimo ou logado com Google
-            const isAnonymous = !currentUser || currentUser.isAnonymous;
-            const displayName = currentUser && !isAnonymous ? (currentUser.displayName || 'Usuário') : null;
-
-            if (isAnonymous) {
-                authContainer.innerHTML = `
-                    <button onclick="handleGoogleLogin()" class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                        <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                        Login
-                    </button>
-                `;
-            } else {
-                authContainer.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <span class="text-sm font-medium text-gray-700 hidden sm:block">Olá, ${displayName}</span>
-                        <button onclick="handleLogout()" class="text-sm text-red-600 hover:text-red-800 font-medium">Sair</button>
-                    </div>
-                `;
-            }
+            }, (error) => console.error("Erro ao carregar opiniões:", error));
         }
 
         // ==========================================
-        // DADOS (FIRESTORE)
+        // 3. FUNÇÕES PRINCIPAIS DO APP (EXPOSTAS NO WINDOW.APP)
         // ==========================================
-        let unsubBooks = null;
-        let unsubReviews = null;
-
-        function fetchData() {
-            if (!currentUser) return;
-
-            const booksRef = getCollectionPath('books');
-            unsubBooks = onSnapshot(booksRef, (snapshot) => {
-                allBooks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        window.app = {
+            
+            // Navegação entre "Páginas" (divs)
+            navigate: function(viewId) {
+                // Esconder todas
+                document.getElementById('view-home').classList.add('hide');
+                document.getElementById('view-book-details').classList.add('hide');
+                document.getElementById('view-reader').classList.add('hide');
                 
-                if (allBooks.length === 0) {
-                    seedInitialBooks();
+                // Mostrar a requisitada
+                document.getElementById('view-' + viewId).classList.remove('hide');
+
+                // Controle do footer e body scroll
+                if(viewId === 'reader') {
+                    document.getElementById('mainFooter').classList.add('hide');
+                    document.body.style.overflow = 'hidden'; // Evitar scroll duplo
                 } else {
-                    renderBooks();
-                    if (currentView === 'book' && currentBookId) {
-                        // Atualiza a view do livro se um livro for alterado
-                        renderBookDetails(currentBookId);
+                    document.getElementById('mainFooter').classList.remove('hide');
+                    document.body.style.overflow = 'auto';
+                }
+
+                // Limpar listeners específicos ao sair da página do livro
+                if (viewId !== 'book-details' && window.appState.unsubscribeProgress) {
+                    window.appState.unsubscribeProgress();
+                    window.appState.unsubscribeProgress = null;
+                }
+            },
+
+            // Sistema de Login Google (Simulado/Integrado)
+            login: async function() {
+                // Em um ambiente real: signInWithPopup(auth, new GoogleAuthProvider())
+                // No preview iframe, popups de oauth costumam ser bloqueados. 
+                // Então, simulamos visualmente para o usuário poder testar os recursos "logados",
+                // mas continuamos usando a sessão anônima do preview no background para o DB.
+                
+                // Simulação Visual
+                window.appState.isVisualUserLoggedIn = true;
+                window.appState.visualUserData = {
+                    name: "Leitor Google",
+                    uid: window.appState.sysUser.uid // Usamos o ID real do sistema para salvar dados
+                };
+                
+                this.updateAuthUI();
+                
+                // Se estiver na página do livro, recarregar UI (mostrar form de opinião e progresso)
+                if (window.appState.currentBook) {
+                    this.openBook(window.appState.currentBook.id);
+                }
+            },
+
+            logout: function() {
+                window.appState.isVisualUserLoggedIn = false;
+                window.appState.visualUserData = null;
+                this.updateAuthUI();
+                
+                if (window.appState.currentBook) {
+                    this.openBook(window.appState.currentBook.id);
+                }
+            },
+
+            updateAuthUI: function() {
+                const btnLogin = document.getElementById('btnLogin');
+                const userProfile = document.getElementById('userProfile');
+                const loginMsg = document.getElementById('loginToCommentMsg');
+                const opinionForm = document.getElementById('opinionFormContainer');
+                const progressContainer = document.getElementById('userProgressContainer');
+
+                if (window.appState.isVisualUserLoggedIn) {
+                    btnLogin.classList.add('hide');
+                    userProfile.classList.remove('hide');
+                    document.getElementById('userNameDisplay').textContent = window.appState.visualUserData.name;
+                    
+                    if(loginMsg) loginMsg.classList.add('hide');
+                    if(opinionForm) opinionForm.classList.remove('hide');
+                } else {
+                    btnLogin.classList.remove('hide');
+                    userProfile.classList.add('hide');
+                    
+                    if(loginMsg) loginMsg.classList.remove('hide');
+                    if(opinionForm) opinionForm.classList.add('hide');
+                    if(progressContainer) progressContainer.classList.add('hide');
+                }
+            },
+
+            // Filtragem
+            filterCategory: function(category) {
+                window.appState.currentCategory = category;
+                
+                // Atualizar estilo dos botões
+                const btns = document.getElementById('categoryFilters').children;
+                for(let btn of btns) {
+                    if (btn.textContent.trim().toLowerCase() === category.toLowerCase() || (category === 'all' && btn.textContent.trim() === 'Todos')) {
+                        btn.className = "px-4 py-2 rounded-full bg-brand-600 text-white font-medium text-sm whitespace-nowrap";
+                    } else {
+                        btn.className = "px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium text-sm whitespace-nowrap";
                     }
                 }
-            }, (error) => console.error("Erro livros:", error));
+                renderBooks();
+            },
 
-            const reviewsRef = getCollectionPath('reviews');
-            unsubReviews = onSnapshot(reviewsRef, (snapshot) => {
-                allReviews = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                // Ordena por data (mais recente primeiro)
-                allReviews.sort((a, b) => (b.timestamp?.toMillis() || 0) - (a.timestamp?.toMillis() || 0));
+            // Abrir Página do Livro
+            openBook: function(bookId) {
+                const book = window.appState.books.find(b => b.id === bookId);
+                if (!book) return;
+
+                window.appState.currentBook = book;
                 
-                if (currentView === 'book' && currentBookId) {
-                    renderReviews(currentBookId);
+                // Preencher UI
+                document.getElementById('detailCover').src = book.capa;
+                document.getElementById('detailTitle').textContent = book.name;
+                document.getElementById('detailAuthor').textContent = "Por " + book.author;
+                document.getElementById('detailCategory').textContent = book.categoria;
+                document.getElementById('detailDescription').textContent = book.descricao;
+
+                // Controle de Botões de Leitura
+                const btnWeb = document.getElementById('btnReadWeb');
+                const btnPDF = document.getElementById('btnReadPDF');
+                
+                if (book['url-webbook']) {
+                    btnWeb.classList.remove('hide');
+                } else {
+                    btnWeb.classList.add('hide');
                 }
-            }, (error) => console.error("Erro avaliações:", error));
+
+                if (book['url-pdf']) {
+                    btnPDF.classList.remove('hide');
+                } else {
+                    btnPDF.classList.add('hide');
+                }
+
+                // Renderizar Opiniões
+                renderOpinions(book.id);
+                this.updateAuthUI(); // Atualiza visibilidade do form
+
+                // Buscar Progresso se estiver logado
+                if (window.appState.isVisualUserLoggedIn) {
+                    this.listenToProgress(book.id);
+                }
+
+                this.navigate('book-details');
+                window.scrollTo(0,0);
+            },
+
+            // Abrir Leitor
+            startReading: function(type) {
+                const book = window.appState.currentBook;
+                if (!book) return;
+
+                this.navigate('reader');
+                document.getElementById('readerTitle').textContent = book.name;
+
+                const pdfFrame = document.getElementById('pdfFrame');
+                const webContainer = document.getElementById('webBookContainer');
+                const progressUI = document.getElementById('webReaderProgress');
+                const modeIndicator = document.getElementById('readerModeIndicator');
+
+                if (type === 'pdf') {
+                    // Modo PDF
+                    modeIndicator.textContent = "Modo Arquivo PDF";
+                    pdfFrame.classList.remove('hide');
+                    webContainer.classList.add('hide');
+                    progressUI.classList.add('hide'); // Iframe externo não permite rastrear scroll facilmente
+                    
+                    // Em um ambiente real apontaria para book['url-pdf']. 
+                    // Para o preview seguro (evitar bloqueios cross-origin de iframes aleatórios), usamos um pdf dummy ou wiki.
+                    pdfFrame.src = "https://en.wikipedia.org/wiki/Special:Random"; 
+                    
+                } else if (type === 'web') {
+                    // Modo WebBook Interno
+                    modeIndicator.textContent = "Modo Leitor Web";
+                    pdfFrame.classList.add('hide');
+                    webContainer.classList.remove('hide');
+                    
+                    // Se logado, mostra barra de progresso no header
+                    if (window.appState.isVisualUserLoggedIn) {
+                        progressUI.classList.remove('hide');
+                        // Buscar progresso salvo para atualizar barra inicial
+                        const progress = getSavedProgress(book.id);
+                        document.getElementById('liveProgressTxt').textContent = progress;
+                        document.getElementById('liveProgressBar').style.width = progress + '%';
+                        
+                        // Rolar para a posição salva (aproximada)
+                        setTimeout(() => {
+                            const scrollHeight = webContainer.scrollHeight - webContainer.clientHeight;
+                            webContainer.scrollTop = (progress / 100) * scrollHeight;
+                        }, 100);
+                    } else {
+                        progressUI.classList.add('hide');
+                    }
+
+                    // Gerar texto mockado longo para simular livro
+                    document.getElementById('webBookContent').innerHTML = `
+                        <h1 class="text-3xl font-bold text-center mb-10">${book.name}</h1>
+                        <p class="mb-6">Capítulo 1: O Início</p>
+                        ${Array(15).fill('<p class="mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>').join('')}
+                        <h2 class="text-2xl font-bold text-center my-10 border-t border-slate-200 pt-10">Capítulo 2: O Desenvolvimento</h2>
+                        ${Array(15).fill('<p class="mb-4">Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui.</p>').join('')}
+                        <h2 class="text-2xl font-bold text-center my-10 border-t border-slate-200 pt-10">Fim</h2>
+                    `;
+
+                    // Listener de Scroll para Progresso
+                    webContainer.onscroll = () => {
+                        if (!window.appState.isVisualUserLoggedIn) return;
+                        
+                        const scrollTop = webContainer.scrollTop;
+                        const scrollHeight = webContainer.scrollHeight - webContainer.clientHeight;
+                        let scrollPercent = 0;
+                        
+                        if (scrollHeight > 0) {
+                            scrollPercent = Math.round((scrollTop / scrollHeight) * 100);
+                        }
+
+                        // Atualiza UI ao vivo
+                        document.getElementById('liveProgressTxt').textContent = scrollPercent;
+                        document.getElementById('liveProgressBar').style.width = scrollPercent + '%';
+
+                        // Salvar no Firebase com Debounce (evitar spam de requests)
+                        clearTimeout(window.scrollTimeout);
+                        window.scrollTimeout = setTimeout(() => {
+                            this.saveProgress(book.id, scrollPercent);
+                        }, 1000);
+                    };
+                }
+            },
+
+            // Salvar Progresso (Privado - Firebase)
+            saveProgress: async function(bookId, percent) {
+                if (!window.appState.sysUser || !window.appState.isVisualUserLoggedIn) return;
+                
+                // Caminho Realtime DB: /users/{userId}/reading/{bookId}
+                // Caminho Preview Firestore: /artifacts/{appId}/users/{userId}/reading/{bookId}
+                const uid = window.appState.visualUserData.uid;
+                const progressRef = doc(db, 'artifacts', appId, 'users', uid, 'reading', bookId);
+                
+                try {
+                    await setDoc(progressRef, { progress: percent }, { merge: true });
+                } catch (error) {
+                    console.error("Erro ao salvar progresso:", error);
+                }
+            },
+
+            // Escutar Mudanças no Progresso (Privado - Firebase)
+            listenToProgress: function(bookId) {
+                if (!window.appState.sysUser || !window.appState.isVisualUserLoggedIn) return;
+                
+                const uid = window.appState.visualUserData.uid;
+                const progressRef = doc(db, 'artifacts', appId, 'users', uid, 'reading', bookId);
+                
+                // Limpar listener anterior se existir
+                if (window.appState.unsubscribeProgress) {
+                    window.appState.unsubscribeProgress();
+                }
+
+                window.appState.unsubscribeProgress = onSnapshot(progressRef, (docSnap) => {
+                    const container = document.getElementById('userProgressContainer');
+                    const lbl = document.getElementById('lblProgress');
+                    const bar = document.getElementById('barProgress');
+                    
+                    container.classList.remove('hide');
+
+                    if (docSnap.exists()) {
+                        const prog = docSnap.data().progress || 0;
+                        lbl.textContent = prog;
+                        bar.style.width = prog + '%';
+                        
+                        // Atualiza estado local auxiliar
+                        if(!window.appState.localProgress) window.appState.localProgress = {};
+                        window.appState.localProgress[bookId] = prog;
+                    } else {
+                        lbl.textContent = '0';
+                        bar.style.width = '0%';
+                    }
+                }, (error) => console.error("Erro no listener de progresso:", error));
+            },
+
+            // Enviar Opinião (Público - Firebase)
+            submitOpinion: async function() {
+                if (!window.appState.isVisualUserLoggedIn) return;
+                
+                const text = document.getElementById('opinionText').value.trim();
+                const bookId = window.appState.currentBook.id;
+                
+                if (!text) {
+                    alert("Escreva algo antes de enviar.");
+                    return;
+                }
+
+                const opinionData = {
+                    bookId: bookId,
+                    user: window.appState.visualUserData.name,
+                    rating: window.appState.currentRating,
+                    text: text,
+                    timestamp: serverTimestamp()
+                };
+
+                // Caminho Realtime DB: /opinions/{bookId}/{novoId} (push)
+                // Caminho Preview Firestore: /artifacts/{appId}/public/data/opinions
+                const opinionsCol = collection(db, 'artifacts', appId, 'public', 'data', 'opinions');
+                
+                try {
+                    await addDoc(opinionsCol, opinionData);
+                    document.getElementById('opinionText').value = '';
+                    // Reset estrelas
+                    setRating(5);
+                } catch (error) {
+                    console.error("Erro ao salvar opinião:", error);
+                }
+            }
+        };
+
+        // ==========================================
+        // 4. FUNÇÕES DE RENDERIZAÇÃO E UI
+        // ==========================================
+        function renderBooks() {
+            const grid = document.getElementById('booksGrid');
+            const noMsg = document.getElementById('noBooksMessage');
+            grid.innerHTML = '';
+
+            const searchTerm = window.appState.searchQuery.toLowerCase();
+            const category = window.appState.currentCategory;
+
+            const filteredBooks = window.appState.books.filter(book => {
+                const matchSearch = book.name.toLowerCase().includes(searchTerm) || book.author.toLowerCase().includes(searchTerm);
+                const matchCategory = category === 'all' ? true : book.categoria === category;
+                return matchSearch && matchCategory;
+            });
+
+            if (filteredBooks.length === 0) {
+                noMsg.classList.remove('hide');
+            } else {
+                noMsg.classList.add('hide');
+                filteredBooks.forEach(book => {
+                    const card = document.createElement('div');
+                    card.className = "bg-white rounded-2xl p-4 border border-slate-200 book-card flex flex-col h-full";
+                    card.onclick = () => window.app.openBook(book.id);
+                    card.innerHTML = `
+                        <div class="bg-slate-100 rounded-xl mb-4 overflow-hidden aspect-[2/3] flex items-center justify-center relative">
+                            <img src="${book.capa}" alt="${book.name}" class="w-full h-full object-cover">
+                            ${book['url-webbook'] ? '<span class="absolute top-2 right-2 bg-brand-500 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase"><i class="fa-solid fa-mobile-screen mr-1"></i>Web</span>' : ''}
+                        </div>
+                        <div class="flex-grow flex flex-col">
+                            <span class="text-xs font-bold text-brand-600 mb-1 uppercase tracking-wider">${book.categoria}</span>
+                            <h3 class="font-bold text-slate-900 leading-tight mb-1 text-sm sm:text-base">${book.name}</h3>
+                            <p class="text-slate-500 text-xs sm:text-sm mb-2">${book.author}</p>
+                            <p class="text-slate-400 text-xs line-clamp-3 mt-auto">${book.descricao}</p>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
         }
 
-        // Semear dados iniciais se o banco estiver vazio
-        async function seedInitialBooks() {
-            const initialBooks = [
+        function renderOpinions(bookId) {
+            const list = document.getElementById('opinionsList');
+            list.innerHTML = '';
+            
+            const bookOpinions = window.appState.opinions.filter(op => op.bookId === bookId);
+            
+            if (bookOpinions.length === 0) {
+                list.innerHTML = '<p class="text-slate-500 text-center py-6 bg-slate-50 rounded-xl border border-dashed border-slate-200">Seja o primeiro a avaliar este livro!</p>';
+                return;
+            }
+
+            bookOpinions.forEach(op => {
+                let starsHTML = '';
+                for(let i=0; i<5; i++) {
+                    starsHTML += `<i class="fa-solid fa-star ${i < op.rating ? 'text-brand-500' : 'text-slate-200'}"></i>`;
+                }
+
+                const item = document.createElement('div');
+                item.className = "bg-slate-50 p-5 rounded-2xl border border-slate-100";
+                item.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-2">
+                            <div class="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-sm">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <span class="font-bold text-slate-900 text-sm">${op.user}</span>
+                        </div>
+                        <div class="text-sm tracking-widest">${starsHTML}</div>
+                    </div>
+                    <p class="text-slate-600 text-sm ml-10">${op.text}</p>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        // ==========================================
+        // 5. UTILITÁRIOS E EVENTOS DE UI
+        // ==========================================
+        
+        // Busca
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            window.appState.searchQuery = e.target.value;
+            renderBooks();
+        });
+
+        // Estrelas de Avaliação (Formulário)
+        const stars = document.getElementById('ratingStars').children;
+        const setRating = (val) => {
+            window.appState.currentRating = val;
+            for(let i=0; i<5; i++) {
+                if(i < val) {
+                    stars[i].classList.replace('text-slate-300', 'text-brand-500');
+                    stars[i].classList.replace('fa-regular', 'fa-solid');
+                } else {
+                    stars[i].classList.replace('text-brand-500', 'text-slate-300');
+                    stars[i].classList.replace('fa-solid', 'fa-regular');
+                }
+            }
+            document.getElementById('ratingText').textContent = val + " estrela" + (val > 1 ? 's' : '');
+        };
+        
+        // Atribuir evento de clique às estrelas
+        Array.from(stars).forEach(star => {
+            if(star.tagName === 'I') {
+                star.addEventListener('click', (e) => setRating(parseInt(e.target.dataset.val)));
+            }
+        });
+
+        function getSavedProgress(bookId) {
+            if(window.appState.localProgress && window.appState.localProgress[bookId]) {
+                return window.appState.localProgress[bookId];
+            }
+            return 0;
+        }
+
+        // ==========================================
+        // 6. POPULAR BANCO DE DADOS (Mock Data Inicial)
+        // ==========================================
+        async function seedMockBooks() {
+            const mockBooks = [
                 {
-                    title: "O Alquimista", author: "Paulo Coelho", category: "Ficção / Aventura",
-                    description: "A mágica história de Santiago, um menino pastor andaluz que anseia por viajar em busca de um tesouro mundano tão extravagante quanto qualquer outro já encontrado.",
-                    coverUrl: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=400"
+                    name: "Pai Rico, Pai Pobre",
+                    author: "Robert Kiyosaki",
+                    categoria: "Finanças",
+                    descricao: "O livro argumenta que o principal motivo pelo qual as pessoas enfrentam dificuldades financeiras é que elas passam anos na escola, mas não aprendem nada sobre dinheiro. O resultado é que as pessoas aprendem a trabalhar por dinheiro, mas nunca aprendem a fazer o dinheiro trabalhar para elas.",
+                    capa: "https://m.media-amazon.com/images/I/81cGEQ-A5yL._AC_UF1000,1000_QL80_.jpg",
+                    "url-pdf": "simulado.pdf",
+                    "url-webbook": "simulado.html"
                 },
                 {
-                    title: "Hábitos Atômicos", author: "James Clear", category: "Desenvolvimento Pessoal",
-                    description: "Não importa quais sejam seus objetivos, Hábitos Atômicos oferece um método comprovado para melhorar todos os dias.",
-                    coverUrl: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=400"
+                    name: "O Alquimista",
+                    author: "Paulo Coelho",
+                    categoria: "Ficção",
+                    descricao: "A mágica história de Santiago, um menino pastor andaluz que anseia por viajar em busca de um tesouro tão extravagante quanto nenhum outro. Da sua casa em Espanha, viaja para os mercados de Tânger e através do deserto egípcio até um encontro fatídico com o alquimista.",
+                    capa: "https://m.media-amazon.com/images/I/81h9h-z2wLL._AC_UF1000,1000_QL80_.jpg",
+                    "url-pdf": "simulado.pdf",
+                    "url-webbook": "simulado.html"
                 },
                 {
-                    title: "1984", author: "George Orwell", category: "Ficção Científica",
-                    description: "Entre os livros seminais do século XX, 1984 de George Orwell é uma rara obra que cresce mais assustadora à medida que seu futuro imaginário se torna realidade.",
-                    coverUrl: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&q=80&w=400"
+                    name: "Hábitos Atômicos",
+                    author: "James Clear",
+                    categoria: "Desenvolvimento",
+                    descricao: "Não importa quais sejam seus objetivos, Hábitos Atômicos oferece um método eficaz para você se aprimorar — todos os dias. James Clear, um dos mais expoentes especialistas na criação de hábitos, revela as estratégias práticas que o ensinarão, exatamente, como criar bons hábitos, abandonar os maus e fazer pequenas mudanças de comportamento que levam a resultados impressionantes.",
+                    capa: "https://m.media-amazon.com/images/I/81XmD014JBL._AC_UF1000,1000_QL80_.jpg",
+                    "url-pdf": "",
+                    "url-webbook": "simulado.html"
+                },
+                {
+                    name: "O Homem Mais Rico da Babilônia",
+                    author: "George S. Clason",
+                    categoria: "Finanças",
+                    descricao: "Com mais de dois milhões de exemplares vendidos no mundo todo, O homem mais rico da Babilônia é um clássico sobre como multiplicar riqueza e solucionar problemas financeiros. Baseando-se nos segredos de sucesso dos antigos babilônicos — os habitantes da cidade mais rica e próspera de seu tempo —, George S. Clason mostra soluções ao mesmo tempo sábias e muito atuais.",
+                    capa: "https://m.media-amazon.com/images/I/71u-P7b11kL._AC_UF1000,1000_QL80_.jpg",
+                    "url-pdf": "simulado.pdf",
+                    "url-webbook": ""
                 }
             ];
 
+            const booksCol = collection(db, 'artifacts', appId, 'public', 'data', 'books');
+            
             try {
-                const booksRef = getCollectionPath('books');
-                for (const book of initialBooks) {
-                    await addDoc(booksRef, book);
+                for(let book of mockBooks) {
+                    await addDoc(booksCol, book);
                 }
-                console.log("Livros iniciais adicionados!");
-            } catch (e) {
-                console.error("Erro ao adicionar dados iniciais", e);
-            }
-        }
-
-        // ==========================================
-        // UI E NAVEGAÇÃO
-        // ==========================================
-        function renderBooks() {
-            booksLoading.classList.add('hidden');
-            booksGrid.classList.remove('hidden');
-            booksGrid.innerHTML = '';
-
-            allBooks.forEach(book => {
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden cursor-pointer border border-gray-100 flex flex-col";
-                card.onclick = () => showBookView(book.id);
-                
-                // Fallback image se não houver coverUrl
-                const imgUrl = book.coverUrl || "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=400";
-
-                card.innerHTML = `
-                    <div class="h-48 w-full overflow-hidden bg-gray-200">
-                        <img src="${imgUrl}" alt="${book.title}" class="w-full h-full object-cover">
-                    </div>
-                    <div class="p-5 flex-grow flex flex-col">
-                        <span class="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">${book.category || 'Livro'}</span>
-                        <h3 class="text-lg font-bold text-gray-900 mb-1 leading-tight">${book.title}</h3>
-                        <p class="text-sm text-gray-500 mb-3">${book.author}</p>
-                        <div class="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center">
-                            <span class="text-sm font-medium text-blue-600 hover:text-blue-800">Ver detalhes &rarr;</span>
-                        </div>
-                    </div>
-                `;
-                booksGrid.appendChild(card);
-            });
-        }
-
-        function showBookView(bookId) {
-            currentView = 'book';
-            currentBookId = bookId;
-            
-            viewHome.classList.add('hidden');
-            viewBookDetail.classList.remove('hidden');
-            
-            renderBookDetails(bookId);
-            renderReviews(bookId);
-            updateReviewFormUI();
-            
-            window.scrollTo(0, 0);
-        }
-
-        function showHomeView() {
-            currentView = 'home';
-            currentBookId = null;
-            
-            viewBookDetail.classList.add('hidden');
-            viewHome.classList.remove('hidden');
-        }
-
-        function renderBookDetails(bookId) {
-            const book = allBooks.find(b => b.id === bookId);
-            if (!book) return;
-
-            document.getElementById('detail-cover').src = book.coverUrl || "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=400";
-            document.getElementById('detail-category').textContent = book.category || 'Categoria Indefinida';
-            document.getElementById('detail-title').textContent = book.title;
-            document.getElementById('detail-author').textContent = book.author;
-            document.getElementById('detail-description').textContent = book.description || 'Sem descrição disponível.';
-        }
-
-        function renderReviews(bookId) {
-            reviewsList.innerHTML = '';
-            
-            // Filtra as avaliações no JS (Regra de não usar queries complexas no firestore)
-            const bookReviews = allReviews.filter(r => r.bookId === bookId);
-
-            if (bookReviews.length === 0) {
-                reviewsList.innerHTML = `
-                    <div class="text-center py-8 bg-white border border-gray-200 rounded-xl">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                        </svg>
-                        <p class="mt-2 text-gray-500">Nenhuma opinião ainda. Seja o primeiro!</p>
-                    </div>`;
-                return;
-            }
-
-            bookReviews.forEach(review => {
-                const date = review.timestamp ? new Date(review.timestamp.toMillis()).toLocaleDateString('pt-BR') : 'Agora';
-                const el = document.createElement('div');
-                el.className = "bg-white p-5 rounded-xl border border-gray-200 shadow-sm";
-                el.innerHTML = `
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="font-medium text-gray-900 flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mr-2 uppercase">
-                                ${review.userName ? review.userName.charAt(0) : 'U'}
-                            </div>
-                            ${review.userName || 'Usuário Anônimo'}
-                        </div>
-                        <div class="text-sm text-gray-500">${date}</div>
-                    </div>
-                    <p class="text-gray-700 whitespace-pre-wrap">${review.text}</p>
-                `;
-                reviewsList.appendChild(el);
-            });
-        }
-
-        function updateReviewFormUI() {
-            const isAnonymous = !currentUser || currentUser.isAnonymous;
-            
-            if (isAnonymous) {
-                reviewFormContainer.classList.add('hidden');
-                loginPrompt.classList.remove('hidden');
-            } else {
-                loginPrompt.classList.add('hidden');
-                reviewFormContainer.classList.remove('hidden');
-            }
-        }
-
-        // Submeter nova avaliação
-        document.getElementById('submit-review-btn').addEventListener('click', async () => {
-            const input = document.getElementById('review-input');
-            const text = input.value.trim();
-            
-            if (!text) {
-                showModal("Escreva algo antes de postar.");
-                return;
-            }
-
-            if (!currentUser || currentUser.isAnonymous) {
-                showModal("Faça login para postar uma opinião.");
-                return;
-            }
-
-            const btn = document.getElementById('submit-review-btn');
-            btn.disabled = true;
-            btn.innerHTML = "Enviando...";
-
-            try {
-                const reviewsRef = getCollectionPath('reviews');
-                await addDoc(reviewsRef, {
-                    bookId: currentBookId,
-                    userId: currentUser.uid,
-                    userName: currentUser.displayName || 'Leitor',
-                    text: text,
-                    timestamp: serverTimestamp()
-                });
-                
-                input.value = '';
-                showModal("Sua opinião foi postada com sucesso!");
+                console.log("Banco de dados populado com sucesso.");
             } catch (error) {
-                console.error("Erro ao postar:", error);
-                showModal("Ocorreu um erro ao postar. Tente novamente.");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = "Postar Opinião";
+                console.error("Erro ao popular banco:", error);
             }
-        });
-
-        // Eventos básicos
-        document.getElementById('logo-btn').addEventListener('click', showHomeView);
-        document.getElementById('back-btn').addEventListener('click', showHomeView);
-        document.getElementById('prompt-login-btn').addEventListener('click', window.handleGoogleLogin);
-
-        // Sistema de Modal
-        window.showModal = (msg) => {
-            document.getElementById('modal-message').textContent = msg;
-            document.getElementById('message-modal').classList.remove('hidden');
-        };
-        window.closeModal = () => {
-            document.getElementById('message-modal').classList.add('hidden');
-        };
-
-        // Inicia a aplicação
-        initAuth();
+        }
 
     </script>
 </body>
