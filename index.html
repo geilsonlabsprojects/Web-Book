@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BiblioHub Pro - Gestão de Acervo</title>
+    <title>BiblioHub Pro - Acervo Oficial</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -13,472 +13,290 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: { 50: '#eff6ff', 100: '#dbeade', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+                        primary: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1' },
                         accent: { 500: '#f59e0b', 600: '#d97706' }
                     },
-                    borderRadius: { '4xl': '2rem', '5xl': '3rem' }
+                    borderRadius: { '4xl': '2rem' }
                 }
             }
         }
     </script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #f1f5f9; 
-            -webkit-font-smoothing: antialiased;
-        }
-
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
         .hide { display: none !important; }
-        
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .book-card {
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .book-card:hover {
-            transform: translateY(-12px) scale(1.02);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-        }
-
-        .skeleton {
-            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .animate-slide { animation: slideIn 0.6s ease-out forwards; }
+        .glass-nav { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226, 232, 240, 0.5); }
+        .book-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .book-card:hover { transform: translateY(-10px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+        .skeleton { background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .animate-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="text-slate-900 overflow-x-hidden">
+<body class="text-slate-900">
 
-    <!-- OVERLAY DE LOGIN -->
-    <div id="loginSection" class="fixed inset-0 z-[1000] bg-slate-950 flex items-center justify-center p-6">
-        <div class="absolute inset-0 opacity-20">
-            <div class="absolute top-0 left-0 w-96 h-96 bg-primary-600 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2"></div>
-            <div class="absolute bottom-0 right-0 w-96 h-96 bg-accent-600 rounded-full blur-[120px] translate-x-1/2 translate-y-1/2"></div>
-        </div>
-        
-        <div class="relative bg-white/90 backdrop-blur-xl p-10 md:p-16 rounded-[3rem] shadow-2xl max-w-lg w-full text-center border border-white/20 animate-slide">
-            <div class="w-24 h-24 bg-gradient-to-tr from-primary-600 to-blue-400 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl rotate-3">
-                <i class="fas fa-book-open-reader text-white text-4xl"></i>
+    <!-- TELA DE LOGIN -->
+    <div id="loginScreen" class="fixed inset-0 z-[1000] bg-slate-900 flex items-center justify-center p-6">
+        <div class="bg-white rounded-[3rem] p-10 md:p-16 max-w-md w-full text-center shadow-2xl animate-in">
+            <div class="w-20 h-20 bg-primary-600 rounded-3xl flex items-center justify-center mx-auto mb-8 text-white text-4xl shadow-lg rotate-3">
+                <i class="fas fa-book-bookmark"></i>
             </div>
-            <h1 class="text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">BiblioHub <span class="text-primary-600">Pro</span></h1>
-            <p class="text-slate-500 text-lg mb-10 font-medium leading-relaxed">Aceda ao repositório central de livros digitais da nossa comunidade.</p>
+            <h1 class="text-3xl font-extrabold mb-2">BiblioHub Pro</h1>
+            <p class="text-slate-500 mb-10 font-medium">Faça login com sua conta Google para acessar os livros do repositório.</p>
             
-            <button id="btnGoogleLogin" class="w-full flex items-center justify-center gap-4 bg-slate-900 text-white py-5 rounded-2xl font-bold text-lg hover:bg-slate-800 transition-all active:scale-95 shadow-xl shadow-slate-900/20">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" class="w-6 h-6" alt="Google">
+            <button id="btnLogin" class="w-full flex items-center justify-center gap-4 bg-white border-2 border-slate-200 py-4 rounded-2xl font-bold hover:bg-slate-50 transition-all active:scale-95 text-slate-700">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" class="w-6 h-6">
                 Entrar com Google
             </button>
-            
-            <div id="loginFeedback" class="mt-6 text-red-500 font-semibold text-sm hide"></div>
+            <div id="loginError" class="mt-4 text-red-500 text-sm font-bold hide"></div>
         </div>
     </div>
 
-    <!-- NAVEGAÇÃO PRINCIPAL -->
-    <nav id="mainNav" class="glass-nav fixed top-0 w-full z-[100] hide">
-        <div class="max-w-7xl mx-auto px-6 lg:px-12">
-            <div class="flex justify-between items-center h-24">
-                <div class="flex items-center gap-4 group cursor-pointer" onclick="router.home()">
-                    <div class="w-12 h-12 bg-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg transition-transform group-hover:rotate-12">
-                        <i class="fas fa-bookmark text-xl"></i>
-                    </div>
-                    <span class="text-2xl font-black tracking-tighter text-slate-900">BIBLIO<span class="text-primary-600">HUB</span></span>
+    <!-- NAVBAR -->
+    <nav id="navbar" class="glass-nav fixed top-0 w-full z-[100] hide">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="app.showHome()">
+                <div class="bg-primary-600 p-2 rounded-xl text-white shadow-md">
+                    <i class="fas fa-layer-group"></i>
                 </div>
-
-                <div class="flex items-center gap-6">
-                    <div id="userBadge" class="hidden md:flex items-center gap-3 bg-slate-100/50 p-1.5 pr-4 rounded-full border border-slate-200">
-                        <img id="userImg" src="" class="w-10 h-10 rounded-full shadow-sm">
-                        <span id="uName" class="text-sm font-bold text-slate-700">Utilizador</span>
-                    </div>
-                    <button id="btnSignOut" class="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-red-500 hover:border-red-100 transition-all">
-                        <i class="fas fa-power-off"></i>
-                    </button>
+                <span class="text-xl font-black tracking-tight">BIBLIO<span class="text-primary-600">HUB</span></span>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="hidden sm:flex items-center gap-3 bg-slate-100 py-1.5 px-3 rounded-full">
+                    <img id="userAvatar" src="" class="w-7 h-7 rounded-full shadow-sm">
+                    <span id="userName" class="text-xs font-bold text-slate-600"></span>
                 </div>
+                <button id="btnLogout" class="text-slate-400 hover:text-red-500 transition-colors p-2">
+                    <i class="fas fa-sign-out-alt text-lg"></i>
+                </button>
             </div>
         </div>
     </nav>
 
-    <!-- CONTEÚDO DA APP -->
-    <main id="appBody" class="pt-32 pb-20 min-h-screen hide">
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main id="mainContent" class="pt-28 pb-20 hide">
         
-        <!-- SECÇÃO: DASHBOARD/HOME -->
-        <section id="viewHome" class="max-w-7xl mx-auto px-6 lg:px-12 animate-slide">
-            
-            <!-- Banner Remote Config -->
-            <div id="rcBanner" class="relative overflow-hidden bg-slate-900 rounded-[2.5rem] p-8 md:p-12 mb-16 text-white shadow-2xl hide">
-                <div class="relative z-10 max-w-2xl">
-                    <span class="inline-block px-4 py-1 bg-primary-600 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-4">Aviso do Sistema</span>
-                    <h2 id="rcContent" class="text-3xl md:text-4xl font-bold mb-4">Carregando novidades...</h2>
+        <!-- HOME / LISTA -->
+        <section id="homeView" class="max-w-7xl mx-auto px-6 animate-in">
+            <div id="remoteBanner" class="bg-gradient-to-r from-primary-600 to-blue-500 text-white p-6 rounded-3xl mb-12 shadow-xl hide">
+                <p id="remoteMsg" class="font-bold text-center text-lg"></p>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
+                <div>
+                    <h2 class="text-4xl font-black mb-2">Acervo Digital</h2>
+                    <p class="text-slate-500 font-medium">Sincronizado com a pasta /livros do seu repositório.</p>
                 </div>
-                <div class="absolute right-0 top-0 h-full w-1/3 opacity-20 pointer-events-none">
-                    <i class="fas fa-bullhorn text-[12rem] translate-x-12 -translate-y-8 rotate-12"></i>
+                <div class="relative w-full md:w-80">
+                    <input type="text" id="searchInput" placeholder="Pesquisar título..." class="w-full pl-12 pr-4 py-3.5 bg-white border-2 border-slate-100 rounded-2xl focus:border-primary-500 outline-none transition-all shadow-sm">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
                 </div>
             </div>
 
-            <!-- Filtros e Busca -->
-            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-10 mb-16">
-                <div class="space-y-2">
-                    <h3 class="text-4xl font-black text-slate-900 tracking-tight">O seu Acervo</h3>
-                    <p class="text-slate-500 font-medium text-lg">Explorar livros disponíveis no seu repositório GitHub.</p>
-                </div>
-                
-                <div class="relative w-full lg:w-[450px]">
-                    <input type="text" id="bookSearch" placeholder="Pesquisar por título, autor ou categoria..." 
-                           class="w-full pl-14 pr-6 py-5 bg-white border-2 border-transparent rounded-3xl shadow-sm outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all text-lg font-medium">
-                    <i class="fas fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 text-xl"></i>
-                </div>
-            </div>
-
-            <!-- Grid de Livros -->
-            <div id="booksContainer" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-10">
-                <!-- Skeletons iniciais -->
-                <div class="space-y-4"><div class="skeleton aspect-[2/3] rounded-3xl"></div><div class="skeleton h-6 w-3/4 rounded-lg"></div></div>
-                <div class="space-y-4"><div class="skeleton aspect-[2/3] rounded-3xl"></div><div class="skeleton h-6 w-3/4 rounded-lg"></div></div>
-                <div class="space-y-4"><div class="skeleton aspect-[2/3] rounded-3xl"></div><div class="skeleton h-6 w-3/4 rounded-lg"></div></div>
-                <div class="space-y-4"><div class="skeleton aspect-[2/3] rounded-3xl"></div><div class="skeleton h-6 w-3/4 rounded-lg"></div></div>
-                <div class="space-y-4"><div class="skeleton aspect-[2/3] rounded-3xl"></div><div class="skeleton h-6 w-3/4 rounded-lg"></div></div>
+            <div id="booksGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+                <!-- Skeleton Loading -->
+                <div class="space-y-3"><div class="skeleton aspect-[2/3] rounded-3xl"></div><div class="skeleton h-4 w-3/4 rounded-md"></div></div>
+                <div class="space-y-3"><div class="skeleton aspect-[2/3] rounded-3xl"></div><div class="skeleton h-4 w-3/4 rounded-md"></div></div>
+                <div class="space-y-3"><div class="skeleton aspect-[2/3] rounded-3xl"></div><div class="skeleton h-4 w-3/4 rounded-md"></div></div>
             </div>
         </section>
 
-        <!-- SECÇÃO: DETALHES -->
-        <section id="viewDetail" class="max-w-6xl mx-auto px-6 lg:px-12 animate-slide hide">
-            <button onclick="router.home()" class="flex items-center gap-3 text-slate-400 font-bold mb-12 hover:text-primary-600 transition-all group">
-                <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center group-hover:-translate-x-1 transition-transform">
-                    <i class="fas fa-chevron-left"></i>
-                </div>
-                Voltar à galeria
+        <!-- DETALHE -->
+        <section id="detailView" class="max-w-5xl mx-auto px-6 hide animate-in">
+            <button onclick="app.showHome()" class="flex items-center gap-2 text-slate-400 font-bold mb-10 hover:text-primary-600">
+                <i class="fas fa-arrow-left"></i> Voltar ao início
             </button>
 
-            <div class="grid lg:grid-cols-12 gap-16">
-                <!-- Capa e Ações -->
-                <div class="lg:col-span-4 xl:col-span-3">
-                    <div class="sticky top-32">
-                        <div class="relative rounded-4xl overflow-hidden shadow-2xl mb-10 group">
-                            <img id="dCover" src="" class="w-full aspect-[2/3] object-cover transition-transform duration-700 group-hover:scale-105">
-                            <div class="absolute inset-0 ring-1 ring-inset ring-black/10 rounded-4xl"></div>
-                        </div>
-                        <div class="space-y-4">
-                            <button id="actionRead" class="w-full py-5 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all">
-                                <i class="fas fa-book-open"></i> Ler Livro
-                            </button>
-                            <button id="actionDownload" class="w-full py-5 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all">
-                                <i class="fas fa-download"></i> Descarregar PDF
-                            </button>
-                        </div>
+            <div class="grid md:grid-cols-12 gap-12 items-start">
+                <div class="md:col-span-4">
+                    <img id="dCover" class="w-full aspect-[2/3] object-cover rounded-[2.5rem] shadow-2xl mb-8">
+                    <div class="space-y-3">
+                        <button id="btnRead" class="w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all"></button>
+                        <button id="btnDownload" class="w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all"></button>
                     </div>
                 </div>
-
-                <!-- Conteúdo -->
-                <div class="lg:col-span-8 xl:col-span-9">
-                    <div class="mb-10">
-                        <span id="dCat" class="inline-block px-5 py-2 bg-primary-100 text-primary-700 rounded-2xl text-xs font-black uppercase tracking-widest mb-6">Categoria</span>
-                        <h2 id="dTitle" class="text-5xl md:text-7xl font-black text-slate-900 mb-4 leading-[0.9]">Título do Livro</h2>
-                        <p id="dAuthor" class="text-2xl text-slate-400 font-bold mb-10">Por Autor do Livro</p>
-                        
-                        <div class="bg-white p-10 rounded-4xl border border-slate-200 shadow-sm leading-relaxed">
-                            <h4 class="text-xl font-black text-slate-900 mb-6 flex items-center gap-3">
-                                <i class="fas fa-quote-left text-primary-500"></i>
-                                Resumo da Obra
-                            </h4>
-                            <p id="dDesc" class="text-slate-600 text-xl font-medium">Descrição detalhada...</p>
-                        </div>
-                    </div>
+                <div class="md:col-span-8">
+                    <span id="dCat" class="text-primary-600 text-xs font-black uppercase tracking-widest mb-3 block">CATEGORIA</span>
+                    <h3 id="dTitle" class="text-5xl font-black mb-2 leading-tight">Título</h3>
+                    <p id="dAuthor" class="text-xl text-slate-400 font-bold mb-10">Autor</p>
                     
-                    <div id="availabilityAlert" class="p-6 bg-red-50 border border-red-100 rounded-3xl flex items-center gap-4 text-red-700 font-bold hide">
-                        <i class="fas fa-circle-exclamation text-xl"></i>
-                        Este exemplar encontra-se indisponível para consulta imediata.
+                    <div class="bg-white p-8 rounded-4xl shadow-sm border border-slate-100">
+                        <h4 class="font-bold text-slate-900 mb-4">Sinopse da Obra</h4>
+                        <p id="dDesc" class="text-slate-600 leading-relaxed text-lg font-medium"></p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- MODAL: LEITOR PDF/WEB -->
-        <section id="viewReader" class="fixed inset-0 z-[2000] bg-white hide flex flex-col">
-            <header class="h-20 bg-slate-950 text-white flex justify-between items-center px-6 shadow-xl">
+        <!-- LEITOR WEB -->
+        <section id="readerView" class="fixed inset-0 z-[2000] bg-white hide flex flex-col">
+            <div class="h-16 bg-slate-900 text-white flex items-center justify-between px-6">
                 <div class="flex items-center gap-4">
-                    <button onclick="router.closeReader()" class="w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center hover:bg-red-600 transition-all">
-                        <i class="fas fa-xmark text-xl"></i>
+                    <button onclick="app.closeReader()" class="w-10 h-10 rounded-lg hover:bg-slate-800 flex items-center justify-center">
+                        <i class="fas fa-times"></i>
                     </button>
-                    <h5 id="rTitle" class="font-black text-lg truncate max-w-xs md:max-w-xl">Lendo...</h5>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="document.documentElement.requestFullscreen()" class="p-3 text-slate-400 hover:text-white transition-colors">
-                        <i class="fas fa-expand"></i>
-                    </button>
-                </div>
-            </header>
-            <div class="flex-grow bg-slate-100 relative">
-                <iframe id="readerIframe" src="" class="w-full h-full border-none shadow-inner"></iframe>
-                <div id="readerLoading" class="absolute inset-0 bg-white flex flex-col items-center justify-center">
-                    <div class="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p class="font-bold text-slate-400">Sincronizando com o repositório...</p>
+                    <span id="rTitle" class="font-bold truncate max-w-xs">Leitura</span>
                 </div>
             </div>
+            <iframe id="readerFrame" src="" class="w-full h-full border-none"></iframe>
         </section>
 
     </main>
-
-    <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[3000] transform translate-y-32 opacity-0 transition-all duration-500">
-        <div class="bg-slate-900 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-4">
-            <i id="toastIcon" class="fas fa-info-circle text-primary-500"></i>
-            <span id="toastMsg" class="font-bold tracking-tight"></span>
-        </div>
-    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getRemoteConfig, fetchAndActivate, getValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-remote-config.js";
 
-        // CONFIGURAÇÃO FIREBASE
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const remoteConfig = getRemoteConfig(app);
+        // CONFIGURAÇÃO OFICIAL ENVIADA
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTbdUYOhLLMFyo3aIx7sfxS12UHkNRaeY",
+            authDomain: "livros-web.firebaseapp.com",
+            projectId: "livros-web",
+            storageBucket: "livros-web.firebasestorage.app",
+            messagingSenderId: "1006236008054",
+            appId: "1:1006236008054:web:495b33ec29657e87372957",
+            measurementId: "G-B50V03QTXW"
+        };
 
-        // CONFIG REMOTE CONFIG
-        remoteConfig.settings.minimumFetchIntervalMillis = 300000; // 5 min
-        remoteConfig.defaultConfig = { 'welcome_message': 'Bem-vindo ao centro de leitura BiblioHub!' };
+        const fApp = initializeApp(firebaseConfig);
+        const auth = getAuth(fApp);
+        const remoteConfig = getRemoteConfig(fApp);
 
-        // ESTADO GLOBAL
-        let globalBooks = [];
-        let currentActiveBook = null;
+        remoteConfig.settings.minimumFetchIntervalMillis = 300000;
+        remoteConfig.defaultConfig = { "welcome_message": "Seja bem-vindo ao BiblioHub!" };
 
-        // CAMINHO DO REPOSITÓRIO (Simulado para o exercício, aponte para o seu GitHub)
-        const GITHUB_ASSETS_PATH = "./livros/data.json";
+        let books = [];
 
-        const api = {
-            async loadAcervo() {
+        const app = {
+            async loadData() {
                 try {
-                    // Tenta carregar do repositório
-                    const response = await fetch(GITHUB_ASSETS_PATH).catch(() => null);
-                    if (response && response.ok) {
-                        globalBooks = await response.json();
+                    // Tenta carregar do seu repositório GitHub (Pasta /livros/)
+                    const res = await fetch('./livros/data.json').catch(() => null);
+                    if (res && res.ok) {
+                        books = await res.json();
                     } else {
-                        // Fallback robusto se o ficheiro do GitHub não estiver pronto
-                        console.warn("Ficheiro data.json não encontrado no GitHub. Usando mocks.");
-                        globalBooks = [
-                            { 
-                                id: 101, 
-                                name: "A Arte da Guerra", 
-                                author: "Sun Tzu", 
-                                categoria: "Estratégia", 
-                                capa: "https://m.media-amazon.com/images/I/41Kst0-NInL._SY445_SX342_.jpg", 
-                                descricao: "Um tratado militar escrito durante o século IV a.C. pelo estrategista Sun Tzu.",
-                                "url-pdf": "",
-                                "url-webbook": "https://www.gutenberg.org/cache/epub/132/pg132-images.html"
-                            },
-                            { 
-                                id: 102, 
-                                name: "Dom Casmurro", 
-                                author: "Machado de Assis", 
-                                categoria: "Clássicos", 
-                                capa: "https://m.media-amazon.com/images/I/81A+SGo+yXL._AC_UF1000,1000_QL80_.jpg", 
-                                descricao: "Uma das obras-primas da literatura brasileira, explorando temas de ciúme e dúvida.",
-                                "url-pdf": "exemplo.pdf",
-                                "url-webbook": ""
-                            },
-                            { 
-                                id: 103, 
-                                name: "Design Patterns", 
-                                author: "Erich Gamma", 
-                                categoria: "Tecnologia", 
-                                capa: "https://m.media-amazon.com/images/I/81gtgoW99GL._AC_UF1000,1000_QL80_.jpg", 
-                                descricao: "Soluções reutilizáveis para problemas comuns no design de software orientado a objetos.",
-                                "url-pdf": "",
-                                "url-webbook": ""
-                            }
+                        // Fallback temporário para testes
+                        books = [
+                            { id: 1, name: "O Poder do Hábito", author: "Charles Duhigg", categoria: "Psicologia", capa: "https://m.media-amazon.com/images/I/817-p9iS+9L._AC_UF1000,1000_QL80_.jpg", descricao: "Um guia fascinante sobre como transformar sua vida através de pequenos hábitos.", "url-pdf": "", "url-webbook": "" },
+                            { id: 2, name: "Dom Casmurro", author: "Machado de Assis", categoria: "Clássico", capa: "https://m.media-amazon.com/images/I/81A+SGo+yXL._AC_UF1000,1000_QL80_.jpg", descricao: "A clássica dúvida: Capitu traiu ou não Bentinho?", "url-pdf": "https://www.mec.gov.br/domcasmurro.pdf", "url-webbook": "https://www.gutenberg.org/cache/epub/132/pg132-images.html" }
                         ];
                     }
-                    render.books();
-                } catch (err) {
-                    notify("Erro ao sincronizar com o GitHub.", "fa-triangle-exclamation");
+                    this.renderBooks();
+                } catch (e) {
+                    console.error("Erro ao carregar data.json:", e);
                 }
-            }
-        };
+            },
 
-        const render = {
-            books() {
-                const container = document.getElementById('booksContainer');
-                const query = document.getElementById('bookSearch').value.toLowerCase();
-                
-                const filtered = globalBooks.filter(b => 
-                    b.name.toLowerCase().includes(query) || 
-                    b.author.toLowerCase().includes(query) ||
-                    b.categoria.toLowerCase().includes(query)
-                );
+            renderBooks() {
+                const grid = document.getElementById('booksGrid');
+                const term = document.getElementById('searchInput').value.toLowerCase();
+                const filtered = books.filter(b => b.name.toLowerCase().includes(term) || b.author.toLowerCase().includes(term));
 
-                if (filtered.length === 0) {
-                    container.innerHTML = `
-                        <div class="col-span-full py-20 text-center">
-                            <i class="fas fa-book-open text-6xl text-slate-200 mb-6"></i>
-                            <p class="text-xl font-bold text-slate-400">Nenhum livro encontrado no repositório.</p>
+                grid.innerHTML = filtered.map(b => `
+                    <div class="book-card group cursor-pointer" onclick="app.showDetail(${b.id})">
+                        <div class="aspect-[2/3] rounded-3xl overflow-hidden shadow-md mb-4 bg-slate-200">
+                            <img src="${b.capa}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                         </div>
-                    `;
-                    return;
-                }
-
-                container.innerHTML = filtered.map(b => `
-                    <div class="book-card group cursor-pointer" onclick="router.detail(${b.id})">
-                        <div class="relative aspect-[2/3] rounded-3xl overflow-hidden shadow-xl bg-slate-200 mb-5">
-                            <img src="${b.capa}" class="w-full h-full object-cover" loading="lazy">
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end p-6">
-                                <span class="w-full py-3 bg-white text-slate-900 rounded-xl font-bold text-center text-sm shadow-2xl translate-y-4 group-hover:translate-y-0 transition-transform">Ver Obra</span>
-                            </div>
-                        </div>
-                        <h4 class="font-black text-slate-900 text-lg leading-tight line-clamp-2 transition-colors group-hover:text-primary-600">${b.name}</h4>
-                        <p class="text-sm font-bold text-slate-400 mt-2 uppercase tracking-wide">${b.author}</p>
+                        <h4 class="font-bold text-slate-900 line-clamp-1">${b.name}</h4>
+                        <p class="text-xs text-slate-400 font-bold uppercase mt-1">${b.author}</p>
                     </div>
                 `).join('');
-            }
-        };
-
-        const router = {
-            home() {
-                document.getElementById('viewHome').classList.remove('hide');
-                document.getElementById('viewDetail').classList.add('hide');
-                document.getElementById('viewReader').classList.add('hide');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
             },
-            detail(id) {
-                currentActiveBook = globalBooks.find(b => b.id === id);
-                if (!currentActiveBook) return;
 
-                const b = currentActiveBook;
+            showHome() {
+                document.getElementById('homeView').classList.remove('hide');
+                document.getElementById('detailView').classList.add('hide');
+                window.scrollTo(0,0);
+            },
+
+            showDetail(id) {
+                const b = books.find(book => book.id === id);
+                if (!b) return;
+
                 document.getElementById('dCover').src = b.capa;
                 document.getElementById('dTitle').textContent = b.name;
-                document.getElementById('dAuthor').textContent = "Por " + b.author;
+                document.getElementById('dAuthor').textContent = b.author;
                 document.getElementById('dCat').textContent = b.categoria;
                 document.getElementById('dDesc').textContent = b.descricao;
 
-                // Lógica de Disponibilidade
-                const btnRead = document.getElementById('actionRead');
-                const btnDown = document.getElementById('actionDownload');
-                const alert = document.getElementById('availabilityAlert');
+                const btnRead = document.getElementById('btnRead');
+                const btnDown = document.getElementById('btnDownload');
 
-                const hasWeb = b['url-webbook'] && b['url-webbook'] !== "";
-                const hasPdf = b['url-pdf'] && b['url-pdf'] !== "";
-
-                if (hasWeb) {
-                    btnRead.className = "w-full py-5 rounded-2xl font-bold flex items-center justify-center gap-3 bg-primary-600 text-white shadow-lg shadow-primary-500/20 hover:bg-primary-700 active:scale-95";
-                    btnRead.innerHTML = `<i class="fas fa-book-open"></i> Ler Livro Agora`;
-                    btnRead.onclick = () => router.openReader(b['url-webbook']);
+                // Lógica de "Indisponível no momento"
+                if (b['url-webbook'] && b['url-webbook'] !== "") {
+                    btnRead.innerHTML = `<i class="fas fa-book-open"></i> Ler Livro`;
+                    btnRead.className = "w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 bg-primary-600 text-white hover:bg-primary-700 shadow-lg shadow-primary-500/20";
+                    btnRead.onclick = () => app.openReader(b['url-webbook'], b.name);
                 } else {
-                    btnRead.className = "w-full py-5 rounded-2xl font-bold flex items-center justify-center gap-3 bg-slate-100 text-slate-400 cursor-not-allowed";
                     btnRead.innerHTML = `<i class="fas fa-clock"></i> Indisponível no momento`;
+                    btnRead.className = "w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 bg-slate-100 text-slate-400 cursor-not-allowed";
                     btnRead.onclick = null;
                 }
 
-                if (hasPdf) {
-                    btnDown.className = "w-full py-5 rounded-2xl font-bold flex items-center justify-center gap-3 bg-white border-2 border-slate-200 text-slate-700 hover:border-primary-200 transition-all active:scale-95";
-                    btnDown.innerHTML = `<i class="fas fa-download"></i> Descarregar PDF`;
+                if (b['url-pdf'] && b['url-pdf'] !== "") {
+                    btnDown.innerHTML = `<i class="fas fa-download"></i> Baixar PDF`;
+                    btnDown.className = "w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 bg-white border-2 border-slate-100 text-slate-700 hover:border-primary-200";
                     btnDown.onclick = () => window.open(b['url-pdf'], '_blank');
                 } else {
-                    btnDown.className = "w-full py-5 rounded-2xl font-bold flex items-center justify-center gap-3 bg-white border-2 border-dashed border-slate-100 text-slate-300 cursor-not-allowed";
                     btnDown.innerHTML = `<i class="fas fa-ban"></i> PDF Indisponível`;
+                    btnDown.className = "w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 bg-white border-2 border-dashed border-slate-100 text-slate-300 cursor-not-allowed";
                     btnDown.onclick = null;
                 }
 
-                if (!hasWeb && !hasPdf) alert.classList.remove('hide');
-                else alert.classList.add('hide');
+                document.getElementById('homeView').classList.add('hide');
+                document.getElementById('detailView').classList.remove('hide');
+                window.scrollTo(0,0);
+            },
 
-                document.getElementById('viewHome').classList.add('hide');
-                document.getElementById('viewDetail').classList.remove('hide');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+            openReader(url, title) {
+                document.getElementById('rTitle').textContent = title;
+                document.getElementById('readerFrame').src = url;
+                document.getElementById('readerView').classList.remove('hide');
             },
-            openReader(url) {
-                document.getElementById('rTitle').textContent = currentActiveBook.name;
-                document.getElementById('readerIframe').src = url;
-                document.getElementById('viewReader').classList.remove('hide');
-                document.getElementById('readerLoading').classList.remove('hide');
-                
-                document.getElementById('readerIframe').onload = () => {
-                    document.getElementById('readerLoading').classList.add('hide');
-                };
-            },
+
             closeReader() {
-                document.getElementById('viewReader').classList.add('hide');
-                document.getElementById('readerIframe').src = "";
+                document.getElementById('readerView').classList.add('hide');
+                document.getElementById('readerFrame').src = "";
             }
         };
 
-        // NOTIFICAÇÕES
-        function notify(msg, icon = "fa-info-circle") {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastMsg').textContent = msg;
-            document.getElementById('toastIcon').className = `fas ${icon} text-primary-500`;
-            toast.classList.remove('translate-y-32', 'opacity-0');
-            setTimeout(() => toast.classList.add('translate-y-32', 'opacity-0'), 4000);
-        }
+        // Listeners
+        document.getElementById('btnLogin').onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => {
+            document.getElementById('loginError').textContent = "Erro ao autenticar. Verifique se o domínio está autorizado.";
+            document.getElementById('loginError').classList.remove('hide');
+        });
 
-        // EVENTOS DE LOGIN
-        document.getElementById('btnGoogleLogin').onclick = async () => {
-            const provider = new GoogleAuthProvider();
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (err) {
-                const fb = document.getElementById('loginFeedback');
-                fb.textContent = "Falha na ligação. Verifique os domínios autorizados.";
-                fb.classList.remove('hide');
-            }
-        };
+        document.getElementById('btnLogout').onclick = () => signOut(auth);
+        document.getElementById('searchInput').oninput = () => app.renderBooks();
 
-        document.getElementById('btnSignOut').onclick = () => signOut(auth);
-
-        // BUSCA EM REAL-TIME
-        document.getElementById('bookSearch').oninput = () => render.books();
-
-        // ESTADO DE AUTENTICAÇÃO
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                document.getElementById('loginSection').classList.add('hide');
-                document.getElementById('mainNav').classList.remove('hide');
-                document.getElementById('appBody').classList.remove('hide');
-                
-                document.getElementById('uName').textContent = user.displayName;
-                document.getElementById('userImg').src = user.photoURL || '';
+                document.getElementById('loginScreen').classList.add('hide');
+                document.getElementById('navbar').classList.remove('hide');
+                document.getElementById('mainContent').classList.remove('hide');
+                document.getElementById('userName').textContent = user.displayName;
+                document.getElementById('userAvatar').src = user.photoURL;
 
-                // Inicializar Remote Config
+                // Remote Config
                 try {
                     await fetchAndActivate(remoteConfig);
                     const msg = getValue(remoteConfig, 'welcome_message').asString();
-                    document.getElementById('rcContent').textContent = msg;
-                    document.getElementById('rcBanner').classList.remove('hide');
-                } catch (e) {}
+                    document.getElementById('remoteMsg').textContent = msg;
+                    document.getElementById('remoteBanner').classList.remove('hide');
+                } catch(e) {}
 
-                // Carregar livros do GitHub
-                api.loadAcervo();
-                notify(`Sessão iniciada como ${user.displayName}`);
+                app.loadData();
             } else {
-                document.getElementById('loginSection').classList.remove('hide');
-                document.getElementById('mainNav').classList.add('hide');
-                document.getElementById('appBody').classList.add('hide');
+                document.getElementById('loginScreen').classList.remove('hide');
+                document.getElementById('navbar').classList.add('hide');
+                document.getElementById('mainContent').classList.add('hide');
             }
         });
 
-        // EXPOR PARA WINDOW
-        window.router = router;
-
+        window.app = app;
     </script>
 </body>
 </html>
